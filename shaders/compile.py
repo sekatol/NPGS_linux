@@ -84,10 +84,14 @@ def needs_recompile(src_name, out_name, defines):
     if not cached_hash:
         return True
 
-    # Hash source + all includes
+    # Determine opt flag for this shader
+    opt = "-O"
+    if "composite" in src_name.lower():
+        opt = "-O0"
+
+    # Hash source + all includes + opt flag + defines
     files = get_included_files(src_path)
-    combined = "".join(file_hash(f) for f in sorted(files, key=str))
-    # Include defines in hash
+    combined = opt + "".join(file_hash(f) for f in sorted(files, key=str))
     combined += "|".join(sorted(defines))
     current_hash = hashlib.md5(combined.encode()).hexdigest()
 
@@ -104,9 +108,8 @@ def compile_shader(src_name, out_name, defines):
         extra_args += [f"-D{d}"]
 
     opt = "-O"
-    # Shaders that include BlackHole_common.glsl need all bindings preserved
-    if "prepass" in src_name.lower() or "composite" in src_name.lower():
-        opt = "-O0"
+    if "composite" in src_name.lower():
+        opt = "-O0"  # -O removes skybox bindings from composite shader
     result = subprocess.run(
         ["glslc", "--target-env=vulkan1.4", opt,
          str(src_path), "-o", str(out_path)] + extra_args,
@@ -158,7 +161,8 @@ def main():
         if src_name and (SHADER_SRC / src_name).exists():
             src_path = SHADER_SRC / src_name
             files = get_included_files(src_path)
-            combined = "".join(file_hash(f) for f in sorted(files, key=str))
+            copts = "-O0" if "composite" in src_name.lower() else "-O"
+            combined = copts + "".join(file_hash(f) for f in sorted(files, key=str))
             combined += "|".join(sorted(defines))
             meta[out_name] = hashlib.md5(combined.encode()).hexdigest()
 
