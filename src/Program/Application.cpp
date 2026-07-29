@@ -1965,6 +1965,23 @@ void FApplication::RenderDebugUI()
     ImGui::SliderInt("DEBUG", &BlackHoleArgs.DEBUG, 0, 5);
     ImGui::PopItemWidth();
     ImGui::End();
+
+    // Time Control panel (separate window)
+    ImGui::Begin("Time Control", nullptr, ImGuiWindowFlags_AlwaysAutoResize);
+    float rate = (float)TimeRate;
+    ImGui::Text("Time Rate: %.1fx", rate);
+    ImGui::PushItemWidth(120);
+    if (ImGui::SliderFloat("##rate", &rate, 0.0f, 10000.0f, "%.1fx")) TimeRate = rate;
+    ImGui::PopItemWidth();
+    if (ImGui::SmallButton("0")) TimeRate = 0.0; ImGui::SameLine();
+    if (ImGui::SmallButton("1")) TimeRate = 1.0; ImGui::SameLine();
+    if (ImGui::SmallButton("10")) TimeRate = 10.0; ImGui::SameLine();
+    if (ImGui::SmallButton("100")) TimeRate = 100.0; ImGui::SameLine();
+    if (ImGui::SmallButton("10^3")) TimeRate = 1000.0; ImGui::SameLine();
+    if (ImGui::SmallButton("10^4")) TimeRate = 10000.0;
+    double gameHours = GameTime / 3600.0;
+    ImGui::Text("Elapsed: %.2f h", gameHours);
+    ImGui::End();
 }
 
 void FApplication::ProcessInput()
