@@ -40,7 +40,7 @@ sudo pacman -S assimp boost
 # Configure
 cd NPGS_linux
 mkdir build && cd build
-cmake .. -DCMAKE_BUILD_TYPE=Debug
+cmake .. -DCMAKE_BUILD_TYPE=Debug # For release: cmake .. -DCMAKE_BUILD_TYPE=Release
 
 # Compile shaders
 cd ..
